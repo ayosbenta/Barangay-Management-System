@@ -17,9 +17,9 @@ const App: React.FC = () => {
   // Mock user data
   const user: User = {
     id: 'user-001',
-    name: 'Cmdr. Alex Reyes',
+    name: 'Hon. Nelson Abellana',
     role: 'Barangay Captain',
-    avatarUrl: 'https://i.pravatar.cc/150?u=a042581f4e29026704d',
+    avatarUrl: 'https://i.pravatar.cc/150?u=nelsonabellana',
   };
 
   const renderModule = () => {

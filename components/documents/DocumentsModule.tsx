@@ -6,6 +6,10 @@ import DocumentForm from './DocumentForm';
 import Modal from '../common/Modal';
 import Button from '../common/forms/Button';
 import PlusIcon from '../icons/PlusIcon';
+import StatCard from '../common/StatCard';
+import DocumentIcon from '../icons/DocumentIcon';
+import ClockIcon from '../icons/ClockIcon';
+import ApprovedIcon from '../icons/ApprovedIcon';
 
 const DocumentsModule: React.FC = () => {
     const { documents, isLoading, addDocument, updateDocument, deleteDocument } = useDocuments();
@@ -13,6 +17,18 @@ const DocumentsModule: React.FC = () => {
     const [isSaving, setIsSaving] = useState(false);
     const [currentDocument, setCurrentDocument] = useState<Document | null>(null);
     const [searchTerm, setSearchTerm] = useState('');
+
+    const documentStats = useMemo(() => {
+        const total = documents.length;
+        const pending = documents.filter(d => d.status === 'Pending').length;
+        const thisMonth = new Date().getMonth();
+        const thisYear = new Date().getFullYear();
+        const approvedThisMonth = documents.filter(d => {
+            const issuedDate = new Date(d.dateIssued);
+            return d.status === 'Approved' && issuedDate.getMonth() === thisMonth && issuedDate.getFullYear() === thisYear;
+        }).length;
+        return { total, pending, approvedThisMonth };
+    }, [documents]);
 
     const handleAddNew = () => {
         setCurrentDocument(null);
@@ -78,7 +94,7 @@ const DocumentsModule: React.FC = () => {
                         Permission is hereby granted to <strong>${doc.residentName.toUpperCase()}</strong> to operate a business known as <strong>"${doc.purpose}"</strong> located within the jurisdiction of this barangay.
                     </p>
                      <p class="body-text">
-                        This permit is issued in accordance with the provisions of the Local Government Code of 1991 and is subject to all existing laws, rules, and regulations. This permit is valid until the end of the current fiscal year and must be renewed annually.
+                        This permit is issued in accordance with the provisions of the Local Government Code of 1919 and is subject to all existing laws, rules, and regulations. This permit is valid until the end of the current fiscal year and must be renewed annually.
                     </p>
                     <p class="issued-text">Issued this ${issuedDate} at Barangay Dumlog, Talisay City, Cebu.</p>
                 `;
@@ -93,21 +109,30 @@ const DocumentsModule: React.FC = () => {
                 <head>
                     <title>${doc.documentType} - ${doc.residentName}</title>
                     <style>
-                        body { font-family: 'Times New Roman', Times, serif; margin: 0; padding: 2rem; color: #000; display: flex; flex-direction: column; align-items: center; }
-                        .print-container { max-width: 8.5in; width: 100%; }
-                        .header { text-align: center; line-height: 1.2; margin-bottom: 3rem; }
-                        .header p { margin: 0; }
-                        .document-title { font-weight: bold; font-size: 1.5rem; margin: 2rem 0; text-align: center; text-transform: uppercase; }
-                        .salutation { margin-top: 2rem; }
-                        .body-text { text-indent: 40px; text-align: justify; line-height: 1.8; font-size: 1.1rem; }
-                        .issued-text { margin-top: 2rem; text-indent: 40px; text-align: justify; line-height: 1.8; font-size: 1.1rem; }
-                        .footer { margin-top: 5rem; text-align: right; }
-                        .signature-line { font-weight: bold; text-transform: uppercase; }
-                        .print-button-container { position: fixed; top: 20px; right: 20px; }
-                        .print-button { padding: 10px 20px; background-color: #0D1B2A; color: white; border: none; border-radius: 5px; cursor: pointer; font-family: sans-serif; }
+                        body { font-family: 'Georgia', 'Times New Roman', Times, serif; margin: 0; padding: 2rem; color: #000; display: flex; flex-direction: column; align-items: center; background-color: #fdfdfd; }
+                        .print-container { max-width: 8.5in; width: 100%; padding: 0.5in; box-sizing: border-box; }
+                        .header { text-align: center; line-height: 1.3; margin-bottom: 1rem; position: relative; }
+                        .header-logos { display: flex; justify-content: space-around; align-items: center; margin-bottom: 1rem; }
+                        .header-logos img { height: 90px; }
+                        .header-text p { margin: 0; font-size: 11pt; }
+                        .header-text strong { font-size: 12pt; }
+                        .header-rule { border-bottom: 2px solid #333; margin-top: 1rem; margin-bottom: 3rem; }
+                        .document-title { font-weight: bold; font-size: 18pt; margin: 2rem 0; text-align: center; text-transform: uppercase; letter-spacing: 2px; }
+                        .salutation { margin-top: 2rem; font-size: 12pt; }
+                        .body-text { text-indent: 40px; text-align: justify; line-height: 2; font-size: 12pt; }
+                        .issued-text { margin-top: 2rem; text-indent: 40px; text-align: justify; line-height: 2; font-size: 12pt; }
+                        .footer-container { display: flex; justify-content: space-between; align-items: flex-end; margin-top: 6rem; }
+                        .seal-placeholder { border: 2px dashed #ccc; border-radius: 50%; width: 120px; height: 120px; display: flex; align-items: center; justify-content: center; text-align: center; font-size: 10pt; color: #999; }
+                        .signature-area { text-align: center; }
+                        .signature-line { font-weight: bold; text-transform: uppercase; font-size: 11pt; margin-top: 60px; }
+                        .captain-title { font-size: 11pt; }
+                        .control-number { position: absolute; top: 0; right: 0; font-family: monospace; font-size: 9pt; color: #555; }
+                        .print-button-container { position: fixed; top: 20px; right: 20px; z-index: 100; }
+                        .print-button { padding: 10px 20px; background-color: #0D1B2A; color: white; border: none; border-radius: 5px; cursor: pointer; font-family: sans-serif; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
                         @media print {
                             .print-button-container { display: none; }
-                            body { padding: 0.5in; }
+                            body { padding: 0; background-color: #fff; }
+                            .print-container { padding: 0.5in; }
                         }
                     </style>
                 </head>
@@ -117,20 +142,31 @@ const DocumentsModule: React.FC = () => {
                     </div>
                     <div class="print-container">
                         <div class="header">
-                            <p>Republic of the Philippines</p>
-                            <p>Province of Cebu</p>
-                            <p>City of Talisay</p>
-                            <p><strong>BARANGAY DUMLOG</strong></p>
-                            <br/>
+                            <span class="control-number">Control No: ${doc.id.toUpperCase()}</span>
+                            <div class="header-logos">
+                                <img src="/img/talisay_logo.jpg" alt="Talisay City Seal" />
+                                <div class="header-text">
+                                    <p>Republic of the Philippines</p>
+                                    <p>Province of Cebu</p>
+                                    <p>City of Talisay</p>
+                                    <p><strong>BARANGAY DUMLOG</strong></p>
+                                </div>
+                                <img src="/img/dumlog_logo.jpg" alt="Barangay Dumlog Seal" />
+                            </div>
                             <p><strong>OFFICE OF THE BARANGAY CAPTAIN</strong></p>
                         </div>
+                        <div class="header-rule"></div>
 
                         ${getDocumentContent(doc)}
 
-                        <div class="footer">
-                            <p>_________________________</p>
-                            <p class="signature-line">Cmdr. Alex Reyes</p>
-                            <p>Barangay Captain</p>
+                        <div class="footer-container">
+                             <div class="seal-placeholder">
+                                Not valid without BARANGAY SEAL
+                            </div>
+                            <div class="signature-area">
+                                <p class="signature-line">HON. NELSON ABELLANA</p>
+                                <p class="captain-title">Barangay Captain</p>
+                            </div>
                         </div>
                     </div>
                 </body>
@@ -155,8 +191,16 @@ const DocumentsModule: React.FC = () => {
 
     return (
         <div className="space-y-6">
-            <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-                 <h2 className="text-2xl font-bold text-bms-text">Document Processing</h2>
+            <h2 className="text-2xl font-bold text-bms-text">Document Processing Command</h2>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <StatCard title="Total Issued" value={documentStats.total} icon={<DocumentIcon className="w-8 h-8" />} />
+                <StatCard title="Pending Requests" value={documentStats.pending} icon={<ClockIcon className="w-8 h-8" />} color="magenta" />
+                <StatCard title="Approved This Month" value={documentStats.approvedThisMonth} icon={<ApprovedIcon className="w-8 h-8" />} />
+            </div>
+
+            <div className="flex flex-col md:flex-row justify-between items-center gap-4 pt-4">
+                 <h3 className="text-xl font-bold text-bms-text">Document Issuance Log</h3>
                  <div className="flex items-center gap-4 w-full md:w-auto">
                     <input 
                         type="text"
