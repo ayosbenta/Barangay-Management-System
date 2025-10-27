@@ -144,14 +144,14 @@ const DocumentsModule: React.FC = () => {
                         <div class="header">
                             <span class="control-number">Control No: ${doc.id.toUpperCase()}</span>
                             <div class="header-logos">
-                                <img src="/img/talisay_logo.jpg" alt="Talisay City Seal" />
+                                <img src="https://drive.google.com/uc?export=view&id=1Tt9KISpdbp5LBjqC4Kc6nNEoTu4JAu1s" alt="Talisay City Seal" />
                                 <div class="header-text">
                                     <p>Republic of the Philippines</p>
                                     <p>Province of Cebu</p>
                                     <p>City of Talisay</p>
                                     <p><strong>BARANGAY DUMLOG</strong></p>
                                 </div>
-                                <img src="/img/dumlog_logo.jpg" alt="Barangay Dumlog Seal" />
+                                <img src="https://drive.google.com/uc?export=view&id=1dLPeGzBamRdsPQGbSBlV7pdInhCVRwGp" alt="Barangay Dumlog Seal" />
                             </div>
                             <p><strong>OFFICE OF THE BARANGAY CAPTAIN</strong></p>
                         </div>
